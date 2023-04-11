@@ -1,18 +1,3 @@
-# React Query Todo
-
-- https://github.com/gopinav/React-Query-Tutorials
-
-# 1. json-server 설치
-
-- https://www.npmjs.com/package/json-server
-
-```
-npm install -g json-server
-```
-
-/db.json 생성
-
-```js
 {
   "posts": [
     {
@@ -36,10 +21,3 @@ npm install -g json-server
     }
   ]
 }
-
-
-```
-
-```js
-json-server --watch ./db.json --port 4000
-```
