@@ -1,5 +1,6 @@
 # React Query
 
+- https://tanstack.com/query/latest
 - React Query는 React 애플리케이션에서 데이터를 관리하고 상태를 업데이트하기 위한 라이브러리입니다. React Query를 사용하면 서버와의 데이터 통신을 추상화하고, 데이터를 캐시하고, 로딩 및 에러 상태를 관리할 수 있습니다.
 
 ### 1. React Query의 핵심 개념은 다음과 같습니다.
