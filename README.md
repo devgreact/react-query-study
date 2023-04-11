@@ -1,70 +1,315 @@
-# Getting Started with Create React App
+# React Query
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- React Query는 React 애플리케이션에서 데이터를 관리하고 상태를 업데이트하기 위한 라이브러리입니다. React Query를 사용하면 서버와의 데이터 통신을 추상화하고, 데이터를 캐시하고, 로딩 및 에러 상태를 관리할 수 있습니다.
 
-## Available Scripts
+### 1. React Query의 핵심 개념은 다음과 같습니다.
 
-In the project directory, you can run:
+- Query
+  Query는 서버로부터 데이터를 가져오는 함수입니다. React Query는 서버로부터 데이터를 가져오고, 이를 캐시하고, 상태를 업데이트합니다. Query는 useQuery hook을 사용하여 사용됩니다.
 
-### `npm start`
+- Mutation
+  Mutation은 서버에 데이터를 변경하는 함수입니다. React Query는 서버에 데이터를 변경하고, 변경 사항을 캐시하고, 상태를 업데이트합니다. Mutation은 useMutation hook을 사용하여 사용됩니다.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Query Key
+  Query Key는 Query 및 Mutation을 유일하게 식별하는 키입니다. Query Key는 문자열, 숫자 또는 객체일 수 있습니다.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Query State
+  Query State는 Query 또는 Mutation의 상태입니다. Query State는 로딩, 에러, 데이터와 같은 정보를 포함합니다.
 
-### `npm test`
+- Query Cache
+  Query Cache는 React Query가 캐시하는 데이터를 저장하는 곳입니다. Query Cache는 기본적으로 메모리에 저장되며, 영속적인 저장소에 저장할 수도 있습니다.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 2.React Query의 사용법은 다음과 같습니다.
 
-### `npm run build`
+React Query 라이브러리 설치하기
+React Query는 npm을 통해 설치할 수 있습니다.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+npm install react-query
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 3.Query 정의하기
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Query는 useQuery hook을 사용하여 정의할 수 있습니다.
 
-### `npm run eject`
+```js
+import { useQuery } from "react-query";
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+function App() {
+  const { data, isLoading, isError } = useQuery("todos", () =>
+    fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+      res.json()
+    )
+  );
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  if (isLoading) return "Loading...";
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  if (isError) return "Error";
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
 
-## Learn More
+## 4.Mutation 정의하기
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Mutation은 useMutation hook을 사용하여 정의할 수 있습니다.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```js
+import { useMutation } from "react-query";
 
-### Code Splitting
+function App() {
+  const [mutate, { isLoading }] = useMutation((data) =>
+    fetch("https://jsonplaceholder.typicode.com/todos", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    }).then((res) => res.json())
+  );
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+  const handleClick = () => {
+    mutate({ title: "New todo", completed: false });
+  };
 
-### Analyzing the Bundle Size
+  return (
+    <div>
+      <button onClick={handleClick} disabled={isLoading}>
+        {isLoading ? "Adding todo..." : "Add todo"}
+      </button>
+    </div>
+  );
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 5.React Query 옵션
 
-### Making a Progressive Web App
+다양한 옵션을 제공하여 더욱 세밀한 데이터 관리와 상태 업데이트를 할 수 있습니다. 주요 옵션은 다음과 같습니다.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- staleTime
+  staleTime 옵션은 캐시된 데이터가 "stale"한 상태가 되는 시간(밀리초)을 설정합니다. "stale"한 상태란, 캐시된 데이터가 만료되기 전에 이전 데이터를 사용하여 UI를 빠르게 렌더링하는 것입니다. 기본값은 0(데이터가 만료되면 바로 새로운 데이터를 가져옴)입니다.
 
-### Advanced Configuration
+```js
+import { useQuery } from "react-query";
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+function App() {
+  const { data, isLoading } = useQuery(
+    "todos",
+    () =>
+      fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+        res.json()
+      ),
+    {
+      staleTime: 10000, // 10초
+    }
+  );
 
-### Deployment
+  if (isLoading) return "Loading...";
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
 
-### `npm run build` fails to minify
+- cacheTime
+  cacheTime 옵션은 캐시된 데이터를 유지할 시간(밀리초)을 설정합니다. 기본값은 Infinity(무제한)입니다.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```js
+import { useQuery } from "react-query";
+
+function App() {
+  const { data, isLoading } = useQuery(
+    "todos",
+    () =>
+      fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+        res.json()
+      ),
+    {
+      cacheTime: 60000, // 1분
+    }
+  );
+
+  if (isLoading) return "Loading...";
+
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+- refetchInterval
+  refetchInterval 옵션은 데이터를 주기적으로 다시 가져오는 간격(밀리초)을 설정합니다. 기본값은 false(다시 가져오지 않음)입니다.
+
+```js
+import { useQuery } from "react-query";
+
+function App() {
+  const { data, isLoading } = useQuery(
+    "todos",
+    () =>
+      fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+        res.json()
+      ),
+    {
+      refetchInterval: 10000, // 10초마다 다시 가져옴
+    }
+  );
+
+  if (isLoading) return "Loading...";
+
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+- retry
+  retry 옵션은 데이터 가져오기에 실패했을 때 다시 시도하는 횟수를 설정합니다. 기본값은 3입니다.
+
+```js
+import { useQuery } from "react-query";
+
+function App() {
+  const { data, isLoading, isError } = useQuery(
+    "todos",
+    () =>
+      fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+        res.json()
+      ),
+    {
+      retry: 5, // 5번 다시 시도
+    }
+  );
+
+  if (isLoading) return "Loading...";
+  if (isError) return "Error!";
+
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+위 코드에서는 useQuery를 사용하여 'todos' 쿼리를 정의하고, 데이터를 가져오는 fetch 함수를 지정합니다. 그리고 retry 옵션을 5로 설정하여 데이터 가져오기에 실패했을 때 최대 5번 다시 시도하도록 합니다. 만약 이 옵션을 사용하지 않는다면, 데이터 가져오기에 실패하면 즉시 에러가 발생합니다.
+
+retry 옵션은 유용하지만, 과도한 시도로 인해 서버에 부하를 일으킬 수 있으므로 적절히 조절해야 합니다. 또한, 다시 시도해도 계속 실패하는 경우에는 쿼리 자체를 재설계하는 것이 좋습니다.
+
+- retryDelay
+  retryDelay 옵션은 데이터 가져오기에 실패했을 때 다시 시도하는 간격(밀리초)을 설정합니다. 기본값은 0입니다.
+
+```js
+import { useQuery } from "react-query";
+
+function App() {
+  const { data, isLoading, isError } = useQuery(
+    "todos",
+    () =>
+      fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+        res.json()
+      ),
+    {
+      retry: 5, // 5번 다시 시도
+      retryDelay: 1000, // 1초마다 다시 시도
+    }
+  );
+
+  if (isLoading) return "Loading...";
+  if (isError) return "Error!";
+
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+- enabled
+  enabled 옵션은 쿼리를 사용할지 여부를 설정합니다. 기본값은 true입니다.
+
+```js
+import { useQuery } from "react-query";
+
+function App() {
+  const { data, isLoading } = useQuery(
+    "todos",
+    () =>
+      fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+        res.json()
+      ),
+    {
+      enabled: false, // 쿼리 사용하지 않음
+    }
+  );
+
+  if (isLoading) return "Loading...";
+
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+- suspense
+  suspense 옵션은 useQuery를 사용할 때 React의 Suspense 기능을 사용할지 여부를 설정합니다. 기본값은 false입니다.
+
+```js
+import { useQuery } from "react-query";
+
+function Todos() {
+  const { data } = useQuery("todos", () =>
+    fetch("https://jsonplaceholder.typicode.com/todos").then((res) =>
+      res.json()
+    )
+  );
+
+  return (
+    <div>
+      {data.map((todo) => (
+        <div key={todo.id}>{todo.title}</div>
+      ))}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <React.Suspense fallback="Loading...">
+        <Todos />
+      </React.Suspense>
+    </div>
+  );
+}
+```
+
+이외에도 많은 옵션이 존재하며, 이는 React Query의 공식 문서에서 확인할 수 있습니다.
