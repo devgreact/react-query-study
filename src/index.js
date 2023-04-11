@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { QueryClient, QueryClientProvider } from "react-query";
+// import { ReactQueryDevtools } from "react-query/devtools";
 
 // QueryClient 인스턴스를 생성합니다.
 const queryClient = new QueryClient();
@@ -14,6 +15,8 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 // App 컴포넌트를 QueryClientProvider 내부에 렌더링합니다.
 root.render(
   <QueryClientProvider client={queryClient}>
+    {/* devtools */}
+    {/* <ReactQueryDevtools initialIsOpen={true} /> */}
     <App />
   </QueryClientProvider>
 );
